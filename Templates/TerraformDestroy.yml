@@ -1,0 +1,8 @@
+steps:
+ - task: TerraformTaskV4@4
+   displayName: Terraform destroy
+   inputs:
+        provider: 'azurerm'
+        command: 'destroy'
+        environmentServiceNameAzureRM: $(Serviceconnection)
+        workingDirectory: '$(Pipeline.Workspace)/Terraform/TerraformManifest'

@@ -1,0 +1,10 @@
+steps:    
+- task: AzurePowerShell@5
+  displayName: FetchStorageKey
+  inputs:
+    azureSubscription: $(Serviceconnection)
+    ScriptType: 'InlineScript'
+    Inline: |
+      $key=(Get-AzStorageAccountKey -ResourceGroupName $(bkstoragerg) -Name $(bkstorage)).Value[0]             
+      Write-Host  "##vso[task.setvariable variable=storagekey]$key"
+    azurePowerShellVersion: 'LatestVersion'

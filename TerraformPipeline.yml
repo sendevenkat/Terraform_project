@@ -1,0 +1,188 @@
+
+trigger: none
+#- main
+
+variables:
+- group: terrform.var
+- name: vmImageName
+  value: windows-latest
+
+pool:    
+  vmImage: $(vmImageName)
+
+stages: 
+- stage: copyandpublish
+  displayName: Copy$publish
+  jobs:
+  - job: copyfiles
+    steps:   
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: Terraform
+
+##########################################################
+######  create webapp_plan
+##########################################################
+
+- stage: 'DeployINFRA'
+  displayName: 'DeployINFRA'
+  dependsOn: copyandpublish
+  condition:  succeeded()
+  jobs:
+  - deployment: 'DeployINFRA'
+    pool: 
+       vmImage: $(vmImageName)      
+    environment: dev 
+    strategy:
+      runOnce:
+        deploy:
+          steps:   
+          - download: current
+            artifact: Terraform 
+          - template: Templates/StorageAccount.yml
+          - template: Templates/fetch storage key.yml
+          - template: Templates/ReplaceToken.yml   
+          - template: Templates/Terraforminstall.yml
+          - template: Templates/Terraforminit.yml
+          - template: Templates/TerraformValidate.yml
+          - template: Templates/TerraformPlan.yml
+          - template: Templates/TerraformApply.yml
+#          - template: Templates/TerraformDestroy.yml
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+         
+      # - task: AzureCLI@2
+      #   inputs:
+      #     azureSubscription: $(Serviceconnection)
+      #     scriptType: 'ps'
+      #     scriptLocation: 'inlineScript'
+      #     inlineScript: |
+      #       az group create  --name $(bkstoragerg)  --location eastus           
+      #       az storage account create  --name $(bkstorage)  --resource-group $(bkstoragerg)  --location eastus  --sku Standard_LRS             
+      #       az storage container create  --name $(bkcontainer)  --account-name  $(bkstorage)          
+      #       az storage account keys list -g $(bkstoragerg) -n $(bkstorage)
+      # - task: AzurePowerShell@5
+      #   inputs:
+      #     azureSubscription: $(Serviceconnection)
+      #     ScriptType: 'InlineScript'
+      #     Inline: |
+      #       $key=(Get-AzStorageAccountKey -ResourceGroupName $(bkstoragerg) -Name $(bkstorage)).Value[0]             
+      #       Write-Host  "##vso[task.setvariable variable=storagekey]$key"
+      #     azurePowerShellVersion: 'LatestVersion'
+      # - task: replacetokens@5
+      #   inputs:
+      #     targetFiles: '**/*.tf'
+      #     encoding: 'auto'
+      #     tokenPattern: 'rm'
+      #     writeBOM: true
+      #     actionOnMissing: 'warn'
+      #     keepToken: false
+      #     actionOnNoFiles: 'continue'
+      #     enableTransforms: false
+      #     enableRecursion: false
+      #     useLegacyPattern: false
+      #     enableTelemetry: true
+      # - task: TerraformInstaller@1
+      #   inputs:
+      #     terraformVersion: 'latest'
+      # - task: TerraformTaskV4@4
+      #   displayName: Terraform init
+      #   inputs:
+      #     provider: 'azurerm'
+      #     command: 'init'
+      #     backendServiceArm: $(Serviceconnection)
+      #     backendAzureRmResourceGroupName: '$(bkstoragerg)'
+      #     backendAzureRmStorageAccountName: '$(bkstorage)'
+      #     backendAzureRmContainerName: '$(bkcontainer)'
+      #     backendAzureRmKey: '$(bkstrgkey)'
+      # - task: TerraformTaskV4@4
+      #   displayName: Terraform Validate
+      #   inputs:
+      #     provider: 'azurerm'
+      #     command: 'validate'
+      # - task: TerraformTaskV4@4
+      #   displayName: Terraform Plan
+      #   inputs:
+      #     provider: 'azurerm'
+      #     command: 'plan'
+      #     environmentServiceNameAzureRM: $(Serviceconnection)
+      # - task: TerraformTaskV4@4
+      #   displayName: Terraform apply
+      #   inputs:
+      #     provider: 'azurerm'
+      #     command: 'apply'
+      #     environmentServiceNameAzureRM: $(Serviceconnection)
+      # - task: TerraformTaskV4@4
+      #   displayName: Terraform destroy
+      #   inputs:
+      #     provider: 'azurerm'
+      #     command: 'destroy'
+      #     environmentServiceNameAzureRM: $(Serviceconnection)

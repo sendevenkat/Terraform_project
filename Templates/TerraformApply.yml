@@ -1,0 +1,8 @@
+steps:
+      - task: TerraformTaskV4@4
+        displayName: Terraform apply
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          environmentServiceNameAzureRM: $(Serviceconnection)
+          workingDirectory: '$(Pipeline.Workspace)/Terraform/TerraformManifest'

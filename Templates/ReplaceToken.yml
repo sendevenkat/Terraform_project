@@ -1,0 +1,16 @@
+steps:
+      - task: replacetokens@5
+        displayName: Replace Token
+        inputs:
+          rootDirectory: '$(Pipeline.Workspace)/Terraform/TerraformManifest'
+          targetFiles: '**/*.tf'
+          encoding: 'auto'
+          tokenPattern: 'rm'
+          writeBOM: true
+          actionOnMissing: 'warn'
+          keepToken: false
+          actionOnNoFiles: 'continue'
+          enableTransforms: false
+          enableRecursion: false
+          useLegacyPattern: false
+          enableTelemetry: true

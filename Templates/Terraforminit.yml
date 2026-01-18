@@ -1,0 +1,12 @@
+steps:
+      - task: TerraformTaskV4@4
+        displayName: Terraform init
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: $(Serviceconnection)
+          backendAzureRmResourceGroupName: '$(bkstoragerg)'
+          backendAzureRmStorageAccountName: '$(bkstorage)'
+          backendAzureRmContainerName: '$(bkcontainer)'
+          backendAzureRmKey: '$(bkstrgkey)'
+          workingDirectory: '$(Pipeline.Workspace)/Terraform/TerraformManifest'

@@ -1,0 +1,12 @@
+steps:
+- task: AzureCLI@2
+  displayName: createStorageAccount
+  inputs:
+    azureSubscription: $(Serviceconnection)
+    scriptType: 'ps'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+        az group create  --name $(bkstoragerg)  --location eastus           
+        az storage account create  --name $(bkstorage)  --resource-group $(bkstoragerg)  --location eastus  --sku Standard_LRS             
+        az storage container create  --name container123  --account-name  $(bkstorage)          
+        az storage account keys list -g $(bkstoragerg) -n $(bkstorage)
