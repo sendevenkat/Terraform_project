@@ -27,7 +27,7 @@ stages:
     # - template: Templates/fetch storage key.yml
     # - template: Templates/ReplaceToken.yml  
 
-    - template: Templates/Terraforminstall.yml
+    #- template: Templates/Terraforminstall.yml
     - task: TerraformInstaller@1
       inputs:
         terraformVersion: latest
@@ -52,7 +52,7 @@ stages:
   jobs:
   - deployment: 'DeployINFRA'
     pool: 
-       vmImage: $(vmImageName)      
+       vmImage: windows-latest      
     environment: dev 
     strategy:
       runOnce:
