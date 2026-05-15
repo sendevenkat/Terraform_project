@@ -10,8 +10,8 @@ parameters:
   - uat
   - prod
 
-# variables:
-# - group: terrform.var 
+variables:
+- group: terrform.var
 
 pool:    
   vmImage: windows-latest
@@ -30,9 +30,10 @@ stages:
     - task: TerraformInstaller@1
       inputs:
         terraformVersion: latest
+
     - task: AzureCLI@2
       inputs:
-        azureSubscription:
+        azureSubscription: $(Serviceconnection)
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
