@@ -4,7 +4,6 @@ trigger: none
 
 
 parameters:
-  displayName: env
   name: environment
   default: dev
   values:
