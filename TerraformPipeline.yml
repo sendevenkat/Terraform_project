@@ -46,7 +46,7 @@ stages:
 
 - stage: 'DeployINFRA'
   displayName: 'DeployINFRA'
-  dependsOn: copyandpublish
+  dependsOn: terraformplan
   condition:  succeeded()
   jobs:
   - deployment: 'DeployINFRA'
