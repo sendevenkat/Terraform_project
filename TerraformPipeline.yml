@@ -2,32 +2,49 @@
 trigger: none
 #- main
 
+
+parameters:
+  displayName: env
+  name: environment
+  default: dev
+  values:
+  - dev
+  - uat
+  - prod
+
 variables:
-- group: terrform.var
-- name: vmImageName
-  value: windows-latest
+- group: terrform.var 
 
 pool:    
-  vmImage: $(vmImageName)
+  vmImage: windows-latest
 
 stages: 
-- stage: copyandpublish
-  displayName: Copy$publish
+- stage: terraformplan
+  displayName: terraformplan
   jobs:
-  - job: copyfiles
-    steps:   
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: '$(Build.SourcesDirectory)'
-        Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    
-    - publish: $(Build.ArtifactStagingDirectory)
-      artifact: Terraform
+  - job: terraformplan
+    steps: 
+    # - template: Templates/StorageAccount.yml
+    # - template: Templates/fetch storage key.yml
+    # - template: Templates/ReplaceToken.yml  
 
-##########################################################
-######  create webapp_plan
-##########################################################
+    - template: Templates/Terraforminstall.yml
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: latest
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription:
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          cd terraform_project/env/${{ parameters.environment }}
+          Terraforminit
+          TerraformValidate
+          TerraformPlan \
+          - var-file=${{ parameters.environment }}.tfvars \
+          - output=tfplan
+
 
 - stage: 'DeployINFRA'
   displayName: 'DeployINFRA'
@@ -42,17 +59,20 @@ stages:
       runOnce:
         deploy:
           steps:   
-          - download: current
-            artifact: Terraform 
-          - template: Templates/StorageAccount.yml
-          - template: Templates/fetch storage key.yml
-          - template: Templates/ReplaceToken.yml   
-          - template: Templates/Terraforminstall.yml
-          - template: Templates/Terraforminit.yml
-          - template: Templates/TerraformValidate.yml
-          - template: Templates/TerraformPlan.yml
-          - template: Templates/TerraformApply.yml
-#          - template: Templates/TerraformDestroy.yml
+            - task: TerraformInstaller@1
+              inputs:
+                terraformVersion: latest
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription:
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  cd terraform_project/env/${{ parameters.environment }}
+                  Terraform init
+                  Terraform apply -auto-approve tfplan
+
+
      
 
 
