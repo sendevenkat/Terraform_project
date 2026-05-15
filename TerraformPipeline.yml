@@ -2,17 +2,16 @@
 trigger: none
 #- main
 
-
 parameters:
-  name: environment
+- name: environment
   default: dev
   values:
   - dev
   - uat
   - prod
 
-variables:
-- group: terrform.var 
+# variables:
+# - group: terrform.var 
 
 pool:    
   vmImage: windows-latest
