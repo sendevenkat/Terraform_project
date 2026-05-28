@@ -73,7 +73,7 @@ stages:
                 terraformVersion: latest
             - task: AzureCLI@2
               inputs:
-                azureSubscription:
+                azureSubscription: $(Serviceconnection)
                 scriptType: bash
                 scriptLocation: inlineScript
                 inlineScript: |
