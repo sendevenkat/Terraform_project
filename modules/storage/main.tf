@@ -1,11 +1,11 @@
 resource "azurerm_storage_account" "dev-storage" {
-  name                     = "dev-12657@#$"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
+  name                     = var.storage_account_name
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_tier             = var.account_tier
+  account_replication_type = var.replication_type
 
   tags = {
-    environment = "staging"
+    environment = "dev"
   }
 }
